@@ -1,0 +1,120 @@
+---
+title: "sharks"
+author: "Atraoui Chaimaa, Laurence Ren"
+date: "2022-11-16"
+output: html_document
+---
+## mise en forme du jeu de donnée 
+```{r}
+
+
+require(dplyr)
+
+requin <- read.csv("attacks.csv") 
+dim(requin) #  25723    24
+
+req <- requin %>% 
+  select("Date","Year", "Type", "Country", "Area","Activity", "Fatal..Y.N.") %>%
+  filter(Year >= 1930) 
+dim(req) # 5054    6
+
+sum(is.na(req)) # 0 donc pas de na 
+```
+total des attaques par année. visualisation temporelle par type. 
+```{r}
+library("dplyr")
+library("tidyr")
+#nbr des attaques par annee
+val <- req %>% count(Year, sort = TRUE)
+##nbr des attaques par annee pour chque type
+typ <- req %>% count(Year,Type, sort = TRUE)
+typ[typ==""]<-NA
+typ <- typ %>%
+  mutate_at(c('Type'), ~replace_na(.,"Unknown"))
+```
+
+
+```{r}
+library(ggplot2)
+library(plotly)
+ggplot(val, aes(Year,n)) + geom_line(aes( color=Year))
+type_plot <- ggplot(typ, aes(Year,n)) + geom_line(aes( color=Type))
+
+type_plot+ggtitle("Evolution des attaques par types") +ylab("Année") + xlab("Nb Attaques")
+ggplotly(type_plot, tooltip=c("text","x","y", "Type"))
+```
+
+
+```{r}
+t1 <- ggplot(typ, aes(Year,Type)) + geom_line(aes( color='Unknown'));t1
+t2 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Unprovoked'));t2
+t3 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Sea Disaster'));t3
+t4 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Questionable'));t4
+t5 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Provoked'));t5
+t6 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Invalid'));t6
+t7 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Boatomg'));t7
+t8 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Boating'));t8
+t9 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Boat'));t9
+```
+
+graphe évolution par année des attaques 
+```{r}
+# Data transformation
+df <- typ %>% 
+  group_by(Type) %>% # Variable to be transformed
+  count() %>% 
+  ungroup() %>% 
+  mutate(perc = `n` / sum(`n`)) %>% 
+  arrange(perc) %>%
+  mutate(labels = scales::percent(perc))
+pie <- ggplot(df, aes(x = "", y = perc, fill = Type)) +
+  geom_col(color = "black") +
+  geom_text(aes(label = labels),
+            position = position_stack(vjust = 0.5)) +
+  coord_polar(theta = "y") + scale_fill_brewer()
+
+
+ggplotly(pie)
+```
+
+```{r}
+colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
+
+fig <- plot_ly(df, labels = ~Type, values = ~perc, type = 'pie',
+        textposition = 'inside',
+        textinfo = 'label+percent',
+        insidetextfont = list(color = '#FFFFFF'),
+        hoverinfo = 'text',
+        text = ~paste('', n, ' attaques'),
+        marker = list(colors = colors,
+                      line = list(color = '#FFFFFF', width = 1)),
+                      #The 'pull' attribute can also be used to create space between the sectors
+        showlegend = FALSE)
+fig <- fig %>% layout(title = 'Pourcentages des attaques par type de 1930 à 2018)',
+         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+
+fig
+
+```
+
+```{r}
+library(scales)
+colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)')
+df <- req %>% 
+  group_by(Fatal..Y.N.) %>% # Variable to be transformed
+  count() %>% 
+  ungroup() %>% 
+  mutate(perc = `n` / sum(`n`)) %>% 
+  arrange(perc) %>%
+  mutate(labels = scales::percent(perc))
+pie <- ggplot(df, aes(x = "", y = perc, fill = Fatal..Y.N.)) +
+  geom_col(color = "black") +
+  geom_text(aes(label = labels),
+            position = position_stack(vjust = 0.5)) +
+  coord_polar(theta = "y")  + scale_fill_brewer("Fatality") +  
+  theme(axis.text.x=element_blank())
+
+pie + scale_fill_manual(values =wes_palette("Royal1"))
+```
+

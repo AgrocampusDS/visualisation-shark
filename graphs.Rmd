@@ -4,11 +4,20 @@ author: "Atraoui Chaimaa, Laurence Ren"
 date: "2022-11-16"
 output: html_document
 ---
+
+Importation des packages.
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+
+library(dplyr)
+library(plotly)
+library(flexdashboard)
+```
+
 ## mise en forme du jeu de donnée 
 ```{r}
-
-
-require(dplyr)
 
 requin <- read.csv("attacks.csv") 
 dim(requin) #  25723    24
@@ -58,6 +67,7 @@ t9 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Boat'));t9
 ```
 
 graphe évolution par année des attaques 
+
 ```{r}
 # Data transformation
 df <- typ %>% 

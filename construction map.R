@@ -177,7 +177,7 @@ all.countries[which( ( all.countries  %in% oce_mer| all.countries%in% present  )
 map <- geom %>% 
   ggplot() + 
   geom_sf(aes(fill = attacks)) +
-  scale_fill_distiller(palette = "YlOrRd", trans= "log", direction = 1, 
+  scale_fill_distiller(palette = "YlGnBu", trans= "log", direction = 1, 
                        name="Nombre d'attaque",
                        labels =  function(x) sprintf("%.f", x), 
                        breaks = c(1, 7, 55, 403, 1954),

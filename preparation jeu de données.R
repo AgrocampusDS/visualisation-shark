@@ -19,7 +19,6 @@ fond$name <- tolower(fond$name)
 
 ######
 
-# req_map[req_map$Country == "british isles" ,]$Country <- "united kingdom"
 req_map[req_map$Country == "columbia"   ,]$Country <- "colombia"
 req_map[req_map$Country == "curacao"    ,]$Country <- "curaçao"
 req_map[req_map$Country == "egypt / israel"    ,]$Country <- "egypt" # israel 

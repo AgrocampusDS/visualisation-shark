@@ -296,7 +296,7 @@ nbatq <- ggplot(val, aes(Year,n), alpha= Country ) + geom_line(aes( color=Type))
                        axis.title.y = element_text(face = "bold",size=10),
                        panel.background = element_rect(fill = "white"),
                        panel.grid.major = element_blank()
-                       ) +scale_y_continuous(breaks = seq(0, 88, by = 10))  + scale_colour_manual(values=c("#DAF7A6", "#FFC300", "#FF5733","#C70039", "#900C3F", "#581845"))
+                       ) +scale_y_continuous(breaks = seq(0, 88, by = 10))  + scale_colour_manual(values=c("#DAF7A6", "#E5E4E2", "#FFA500","#C70039", "#E97451", "#6495ED"))
 ```
 
 ```{r, include=FALSE}
@@ -524,7 +524,7 @@ pie <- ggplot(data = req_pie1, aes(x="", y=Pourcentage, fill= Type)) +
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
                    size = 2, nudge_x = 1, show.legend = FALSE) +
   guides(fill = guide_legend(title = "Type")) +
-  labs(title = "Répartion des Types d'attaques") +
+  labs(title = "Répartition des Types d'attaques") +
    theme(plot.title = element_text(size=9),
           legend.text = element_text(size = 5))
   # geom_text(aes(label = Type),
@@ -571,8 +571,7 @@ pie
 ```
 
 
-Column 
------------------------------------------------------------------------
+
 ```{r, include=F}
 
 req_pie2 <- req_pie %>%
@@ -610,9 +609,29 @@ pie2 <- ggplot(data = req_pie2, aes(x="", y=Pourcentage, fill= Activity)) +
 
 ```
 
+Row 
+-------------------------------------
+    
 ### Description des attaques les plus récurrentes
+    
 ```{r}
-plot_grid(pie, pie3,"",pie2, ncol = 2, nrow = 2)
+plot_grid(pie)
+```
+   
+Row {.tabset .tabset-fade}
+-------------------------------------
+   
+### Activities
+
+```{r}
+plot_grid(pie2)
+```   
+ 
+### Intensité
+    
+
+```{r}
+plot_grid(pie3)
 ```
 
 

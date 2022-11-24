@@ -26,18 +26,14 @@ color:black!important;
 ```{r setup, include=FALSE}
 library(flexdashboard)
 library(tidyverse)
-library(ggplot2)
 library(plotly)
 library("sf")
 library("rnaturalearth")
 library("rnaturalearthdata")
 library(RColorBrewer)
-library("sf")
-library("rnaturalearth")
-library("rnaturalearthdata")
-require(ggplot2)
 library("ggnewscale")  
 library(ggrepel)
+library(wesanderson)
 ```
 
 ```{r, include=FALSE}
@@ -463,11 +459,11 @@ pie <- ggplot(data = req_pie1, aes(x="", y=Pourcentage, fill= Type)) +
   geom_bar(stat="identity", width=1, color= "white") +
   coord_polar("y", start=0) +
   theme_void() +
-  scale_fill_manual(values = c("Boat" = "#B6D8F2",
-                               "Invalid" = "#ECF8F6",
-                               "Provoked" = "#ffbdfd",
-                               "Sea Disaster" = "#5784BA",
-                               "Unprovoked" = "#F7F6CF")) +
+  scale_fill_manual(values = c("Boat" = "#DAF7A6",
+                               "Invalid" = "#FFC300",
+                               "Provoked" = "#FF5733",
+                               "Sea Disaster" = "#900C3F",     
+                               "Unprovoked" = "#581845")) +
   geom_label_repel(data = df1,
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
                    size = 4.5, nudge_x = 1, show.legend = FALSE) +
@@ -518,7 +514,7 @@ pie2 <- ggplot(data = req_pie2, aes(x="", y=Pourcentage, fill= Activity)) +
   geom_label_repel(data = df2,
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
                    size = 4.5, nudge_x = 1, show.legend = FALSE) +
-  guides(fill = guide_legend(title = "Type")) +
+  guides(fill = guide_legend(title = "Activity")) +
   
   ggtitle("Activités des victimes lors de l'attaque") 
 # geom_text(aes(label = Type),
@@ -560,6 +556,62 @@ pie3 <- ggplot(data = req_pie3, aes(x="", y=Pourcentage, fill= Fatal..Y.N.)) +
 pie3
 ```
 
+
+Distribution des Types d'attaques
+=======================================================================
+
+Column 
+-------------------------------------
+
+```{r}
+requin <- read.csv("attacks.csv") 
+
+req <- requin %>% 
+  select("Date","Year", "Type", "Country", "Area","Activity", "Fatal..Y.N.") %>%
+  filter(Year >= 1930)
+req3<- req[req$Country %in% c("USA","AUSTRALIA", "SOUTH AFRICA"),]
+#nbr des attaques par annee
+val <- req3 %>% count(Year,Type, sort = TRUE)
+#Types of attacks
+val[val=="Boating"]<-NA
+val <- val %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#
+val[val==""]<-NA
+val <- val %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#graph
+nbatq <- ggplot(val, aes(Year,n), alpha= Country ) + geom_line(aes( color=Type))+ggtitle("Evolution des attaques des requins pour les 3 premiers Pays") +ylab("Nb Attaques") + xlab("Année")+theme(plot.title = element_text(face="bold",color = "#607c8e", size = 15, hjust=0.5,vjust=1, family = "Serif"),
+                       legend.position = c(0.2, 0.8),
+                       axis.title.x = element_text( face = "bold",size=10),
+                       axis.title.y = element_text(face = "bold",size=10),
+                       panel.background = element_rect(fill = "white"),
+                       panel.grid.major = element_blank()
+                       ) +scale_y_continuous(breaks = seq(0, 88, by = 10))  + scale_colour_manual(values=c("#DAF7A6", "#FFC300", "#FF5733","#C70039", "#900C3F", "#581845"))
+ggplotly(nbatq)
+```
+
+
+Column 
+-------------------------------------
+   
+   
+```{r}
+typ2 <- req3  %>% group_by(Country) %>% count(Year,Type, sort = TRUE)
+#
+typ2[typ2=="Boating"]<-NA
+typ2 <- typ2 %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#
+typ2[typ2==""]<-NA
+typ2 <- typ2 %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+ggplot(typ2, aes(x=Type, y=n, fill=Country)) +geom_boxplot(outlier.shape=NA)+
+  scale_fill_manual(values=c("darkgoldenrod1","darkred", "#002868")) + ylab("Nb Attaques")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), panel.background = element_rect(fill = "white"),
+                       panel.grid.major = element_line(colour = "#bababa"))+ scale_y_continuous(breaks = seq(0, 88, by = 10))  +ggtitle(" Distribution Types d'attaques par Pays")
+
+```
 
 
 

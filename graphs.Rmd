@@ -10,9 +10,11 @@ Importation des packages.
 ```{r}
 library(ggplot2)
 library(tidyverse)
-
+library(wesanderson)
 library(dplyr)
 library(plotly)
+library("dplyr")
+library("tidyr")
 library(flexdashboard)
 ```
 
@@ -25,106 +27,118 @@ dim(requin) #  25723    24
 req <- requin %>% 
   select("Date","Year", "Type", "Country", "Area","Activity", "Fatal..Y.N.") %>%
   filter(Year >= 1930) 
+req3<- req[req$Country %in% c("USA","AUSTRALIA", "SOUTH AFRICA"),]
 dim(req) # 5054    6
 
 sum(is.na(req)) # 0 donc pas de na 
-```
-total des attaques par année. visualisation temporelle par type. 
-```{r}
-library("dplyr")
-library("tidyr")
+
+
+#total des attaques par année. visualisation temporelle par type. 
+
+
 #nbr des attaques par annee
-val <- req %>% count(Year, sort = TRUE)
+val <- req3 %>% count(Year,Type, sort = TRUE)
 ##nbr des attaques par annee pour chque type
-typ <- req %>% count(Year,Type, sort = TRUE)
+typ2 <- req3  %>% group_by(Country) %>% count(Year,Type, sort = TRUE)
 typ[typ==""]<-NA
 typ <- typ %>%
   mutate_at(c('Type'), ~replace_na(.,"Unknown"))
+
+##nbr des attaques par  pour chque type
+total <- typ %>% count(Type,n, sort = TRUE)
+
+# Fatality 
+req[req==""]<-NA
+req <- req %>%
+  mutate_at(c('Fatal..Y.N.'), ~replace_na(.,"Unknown"))
+#
+req[req=="UNKNOWN"]<-NA
+req <- req %>%
+  mutate_at(c('Fatal..Y.N.'), ~replace_na(.,"Unknown"))
+#
+req[req=="Unknown"]<-NA
+req <- req %>%
+  mutate_at(c('Fatal..Y.N.'), ~replace_na(.,"M"))
+#
+req[req==" N"]<-NA
+req <- req %>%
+  mutate_at(c('Fatal..Y.N.'), ~replace_na(.,"N"))
+#
+req[req=="2017"]<-NA
+req <- req %>%
+  mutate_at(c('Fatal..Y.N.'), ~replace_na(.,"Y"))
+
+
+#Types of attacks
+val[val=="Boating"]<-NA
+val <- val %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#
+val[val==""]<-NA
+val <- val %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#
+typ2[typ2=="Boating"]<-NA
+typ2 <- typ2 %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#
+typ2[typ2==""]<-NA
+typ2 <- typ2 %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
 ```
 
 
-```{r}
-library(ggplot2)
-library(plotly)
-ggplot(val, aes(Year,n)) + geom_line(aes( color=Year))
-type_plot <- ggplot(typ, aes(Year,n)) + geom_line(aes( color=Type))
+##1-evolution des attaques par annees (count)
+<!-- #scale_fill_manual(values = c( #palette personnalisée -->
+<!--                          'Boat' = "#76C223", -->
+<!--                          'Invalid' = "#76C223", -->
+<!--                          'Provoked' = "#76C223", -->
+<!--                          'Questionable' = "#76C223", -->
+<!--                          'Sea Disaster' = "#76C223", -->
+<!--                          'Unprovoked' = "#76C223"), name = '') -->
 
-type_plot+ggtitle("Evolution des attaques par types") +ylab("Année") + xlab("Nb Attaques")
-ggplotly(type_plot, tooltip=c("text","x","y", "Type"))
+```{r}
+requin <- read.csv("attacks.csv") 
+dim(requin) #  25723    24
+
+req <- requin %>% 
+  select("Date","Year", "Type", "Country", "Area","Activity", "Fatal..Y.N.") %>%
+  filter(Year >= 1930)
+#nbr des attaques par annee
+val <- req3 %>% count(Year,Type, sort = TRUE)
+#Types of attacks
+val[val=="Boating"]<-NA
+val <- val %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#
+val[val==""]<-NA
+val <- val %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#graph
+nbatq <- ggplot(val, aes(Year,n), alpha= Country ) + geom_line(aes( color=Type))+ggtitle("Evolution des attaques des requins pour les 3 premiers Pays") +ylab("Nb Attaques") + xlab("Année")+theme(plot.title = element_text(face="bold",color = "#607c8e", size = 15, hjust=0.5,vjust=1, family = "Serif"),
+                       legend.position = c(0.2, 0.8),
+                       axis.title.x = element_text( face = "bold",size=10),
+                       axis.title.y = element_text(face = "bold",size=10),
+                       panel.background = element_rect(fill = "white"),
+                       panel.grid.major = element_blank()
+                       ) +scale_y_continuous(breaks = seq(0, 88, by = 10))
+
+ggplotly(nbatq)
 ```
-
-
 ```{r}
-t1 <- ggplot(typ, aes(Year,Type)) + geom_line(aes( color='Unknown'));t1
-t2 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Unprovoked'));t2
-t3 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Sea Disaster'));t3
-t4 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Questionable'));t4
-t5 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Provoked'));t5
-t6 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Invalid'));t6
-t7 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Boatomg'));t7
-t8 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Boating'));t8
-t9 <- ggplot(typ, aes(Year,n)) + geom_line(aes( color='Boat'));t9
-```
+typ2 <- req3  %>% group_by(Country) %>% count(Year,Type, sort = TRUE)
+#
+typ2[typ2=="Boating"]<-NA
+typ2 <- typ2 %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#
+typ2[typ2==""]<-NA
+typ2 <- typ2 %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
 
-graphe évolution par année des attaques 
-
-```{r}
-# Data transformation
-df <- typ %>% 
-  group_by(Type) %>% # Variable to be transformed
-  count() %>% 
-  ungroup() %>% 
-  mutate(perc = `n` / sum(`n`)) %>% 
-  arrange(perc) %>%
-  mutate(labels = scales::percent(perc))
-pie <- ggplot(df, aes(x = "", y = perc, fill = Type)) +
-  geom_col(color = "black") +
-  geom_text(aes(label = labels),
-            position = position_stack(vjust = 0.5)) +
-  coord_polar(theta = "y") + scale_fill_brewer()
-
-
-ggplotly(pie)
-```
-
-```{r}
-colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)', 'rgb(171,104,87)', 'rgb(114,147,203)')
-
-fig <- plot_ly(df, labels = ~Type, values = ~perc, type = 'pie',
-        textposition = 'inside',
-        textinfo = 'label+percent',
-        insidetextfont = list(color = '#FFFFFF'),
-        hoverinfo = 'text',
-        text = ~paste('', n, ' attaques'),
-        marker = list(colors = colors,
-                      line = list(color = '#FFFFFF', width = 1)),
-                      #The 'pull' attribute can also be used to create space between the sectors
-        showlegend = FALSE)
-fig <- fig %>% layout(title = 'Pourcentages des attaques par type de 1930 à 2018)',
-         xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
-         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
-
-fig
-
-```
-
-```{r}
-library(scales)
-colors <- c('rgb(211,94,96)', 'rgb(128,133,133)', 'rgb(144,103,167)')
-df <- req %>% 
-  group_by(Fatal..Y.N.) %>% # Variable to be transformed
-  count() %>% 
-  ungroup() %>% 
-  mutate(perc = `n` / sum(`n`)) %>% 
-  arrange(perc) %>%
-  mutate(labels = scales::percent(perc))
-pie <- ggplot(df, aes(x = "", y = perc, fill = Fatal..Y.N.)) +
-  geom_col(color = "black") +
-  geom_text(aes(label = labels),
-            position = position_stack(vjust = 0.5)) +
-  coord_polar(theta = "y")  + scale_fill_brewer("Fatality") +  
-  theme(axis.text.x=element_blank())
-
-pie + scale_fill_manual(values =wes_palette("Royal1"))
+ggplot(typ2, aes(x=Type, y=n, fill=Country)) +geom_boxplot(outlier.shape=NA)+
+  scale_fill_manual(values=c("darkgoldenrod1","darkred", "#002868")) + ylab("Nb Attaques")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), panel.background = element_rect(fill = "white"),
+                       panel.grid.major = element_line(colour = "#bababa"))+ scale_y_continuous(breaks = seq(0, 88, by = 10))  +ggtitle(" Distribution Types d'attaques par Pays")
 ```
 

@@ -38,6 +38,13 @@ library("rnaturalearthdata")
 require(ggplot2)
 library("ggnewscale")  
 library(ggrepel)
+library(ggplot2)
+library(tidyverse)
+library(wesanderson)
+library(dplyr)
+
+library("tidyr")
+
 ```
 
 ```{r, include=FALSE}
@@ -575,6 +582,7 @@ requin <- read.csv("attacks.csv")
 req <- requin %>% 
   select("Date","Year", "Type", "Country", "Area","Activity", "Fatal..Y.N.") %>%
   filter(Year >= 1930)
+req3<- req[req$Country %in% c("USA","AUSTRALIA", "SOUTH AFRICA"),]
 #nbr des attaques par annee
 val <- req3 %>% count(Year,Type, sort = TRUE)
 #Types of attacks

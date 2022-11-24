@@ -563,6 +563,60 @@ pie3
 ```
 
 
+Distribution des Types d'attaques
+=======================================================================
+
+Column 
+-------------------------------------
+
+```{r}
+requin <- read.csv("attacks.csv") 
+dim(requin) #  25723    24
+req <- requin %>% 
+  select("Date","Year", "Type", "Country", "Area","Activity", "Fatal..Y.N.") %>%
+  filter(Year >= 1930)
+#nbr des attaques par annee
+val <- req3 %>% count(Year,Type, sort = TRUE)
+#Types of attacks
+val[val=="Boating"]<-NA
+val <- val %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#
+val[val==""]<-NA
+val <- val %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#graph
+nbatq <- ggplot(val, aes(Year,n), alpha= Country ) + geom_line(aes( color=Type))+ggtitle("Evolution des attaques des requins pour les 3 premiers Pays") +ylab("Nb Attaques") + xlab("Année")+theme(plot.title = element_text(face="bold",color = "#607c8e", size = 15, hjust=0.5,vjust=1, family = "Serif"),
+                       legend.position = c(0.2, 0.8),
+                       axis.title.x = element_text( face = "bold",size=10),
+                       axis.title.y = element_text(face = "bold",size=10),
+                       panel.background = element_rect(fill = "white"),
+                       panel.grid.major = element_blank()
+                       ) +scale_y_continuous(breaks = seq(0, 88, by = 10))
+ggplotly(nbatq)
+```
+
+
+Column 
+-------------------------------------
+   
+   
+```{r}
+typ2 <- req3  %>% group_by(Country) %>% count(Year,Type, sort = TRUE)
+#
+typ2[typ2=="Boating"]<-NA
+typ2 <- typ2 %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+#
+typ2[typ2==""]<-NA
+typ2 <- typ2 %>%
+  mutate_at(c('Type'), ~replace_na(.,"Boat"))
+ggplot(typ2, aes(x=Type, y=n, fill=Country)) +geom_boxplot(outlier.shape=NA)+
+  scale_fill_manual(values=c("darkgoldenrod1","darkred", "#002868")) + ylab("Nb Attaques")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1), panel.background = element_rect(fill = "white"),
+                       panel.grid.major = element_line(colour = "#bababa"))+ scale_y_continuous(breaks = seq(0, 88, by = 10))  +ggtitle(" Distribution Types d'attaques par Pays")
+```
+
 
 
 

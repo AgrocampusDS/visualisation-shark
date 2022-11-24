@@ -202,9 +202,9 @@ library(dplyr)
 #   select("Type",  "Fatal..Y.N.", "Activity")
 
 
-req_pie2 <- req_pie %>%  
+req_pie2 <- req_pie%>%  
   group_by(Type, Fatal..Y.N., Activity) %>%
-  summarise(Effectif = n(), Pourcentage = Effectif/353) 
+  summarise(Effectif = n(), Pourcentage = Effectif/3480) 
 
 req_pie2[which(req_pie2$Type =="Boating"),]$Type <- "Boat"
 req_pie2[which(req_pie2$Type =="Boatomg"),]$Type <- "Boat"
@@ -212,10 +212,16 @@ req_pie2 <- req_pie2[-c(1,2,3),]
 req_pie2[which(req_pie2$Fatal..Y.N. !="Y"),]$Fatal..Y.N.  <- "Autres"
 req_pie2[which(req_pie2$Type == "Questionable"),]$Type <- "Invalid"
 
-PieDonut(req_pie2, aes(Type, Fatal..Y.N., Activity,Pourcentage), 
-         title="Fatalité des attaques par type", ) 
+req_pie[which(req_pie$Type =="Boating"),]$Type <- "Boat"
+req_pie[which(req_pie$Type =="Boatomg"),]$Type <- "Boat"
+req_pie <- req_pie[-c(1,2,3),]
+req_pie[which(req_pie$Fatal..Y.N. !="Y"),]$Fatal..Y.N.  <- "Autres"
+req_pie[which(req_pie$Type == "Questionable"),]$Type <- "Invalid"
 
-
+pie_donut <- PieDonut(req_pie, aes(Type, Fatal..Y.N., Activity,Pourcentage), 
+         title="Fatalité des attaques par type") 
+pie_donut
+table(req)
 
 req_pie2
 ggplot(data = req_pie2, aes(x= Type, y=Pourcentage)) +
@@ -307,7 +313,8 @@ pie2 <- ggplot(data = req_pie2, aes(x="", y=Pourcentage, fill= Activity)) +
                    size = 4.5, nudge_x = 1, show.legend = FALSE) +
   guides(fill = guide_legend(title = "Type")) +
   
-  ggtitle("Activités des victimes lors de l'attaque") 
+  ggtitle("Activités des victimes lors de l'attaque") +
+  pi
 # geom_text(aes(label = Type),
 #           position = position_stack(vjust = 0.5), color="white")
 pie2
@@ -319,23 +326,26 @@ req_pie3 <- req_pie %>%
   group_by(Fatal..Y.N.) %>%
   summarise(Effectif=n(), Pourcentage = Effectif/2448)
 
+req_pie3$Fatal..Y.N.[which(req_pie3$Fatal..Y.N. =="Y")] <- "Mortel"
+req_pie3$Fatal..Y.N.[which(req_pie3$Fatal..Y.N. =="Autres")] <- "Non Mortel"
+
 df3 <- req_pie3 %>% 
   mutate(csum = rev(cumsum(rev(Pourcentage))), 
          pos = Pourcentage/2 + lead(csum, 1),
          pos = if_else(is.na(pos), Pourcentage/2, pos))
 
 pie3 <- ggplot(data = req_pie3, aes(x="", y=Pourcentage, fill= Fatal..Y.N.)) +
-  geom_bar(stat="identity", width=1, color= "white") +
+  geom_bar(stat="identity", width=1, color= "white", color="red") +
   coord_polar("y", start=0) +
   theme_void() +
-  scale_fill_manual(values = c("Y" = "#FC4E00",
-                               "Autres" = "#D4D3DC")) +
+  scale_fill_manual(values = c("Mortel" = "#FC4E00",
+                               "Non Mortel" = "#D4D3DC")) +
   geom_label_repel(data = df3,
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
                    size = 4.5, nudge_x = 1, show.legend = FALSE) +
   guides(fill = guide_legend(title = "Type")) +
   
-  ggtitle("Pourcentage de fatalité chez les types'Unprovoked'") 
+  ggtitle("Intensité de dégâts des attaques 'unprovoked") 
 # geom_text(aes(label = Type),
 #           position = position_stack(vjust = 0.5), color="white")
 pie3
@@ -348,4 +358,7 @@ pie3
 ##############################
 # pie chart avec les activités
 #############################
+
+library(cowplot)
+plot_grid(pie, pie3,"",pie2, ncol = 2, nrow = 2)
 

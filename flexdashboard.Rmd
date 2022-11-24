@@ -281,9 +281,6 @@ map3
 
 # Les raisons des attaques 
 
-Column {data-width=300}
------------------------------------------------------------------------
-
 ```{r,include=FALSE}
 
 req$Country <- tolower(req$Country)
@@ -482,6 +479,10 @@ pie <- ggplot(data = req_pie1, aes(x="", y=Pourcentage, fill= Type)) +
 pie
 ```
 
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
 ```{r}
 pie
 ```
@@ -528,9 +529,6 @@ pie2 <- ggplot(data = req_pie2, aes(x="", y=Pourcentage, fill= Activity)) +
 pie2
 ```
 
-
-Column {data-width=900}
------------------------------------------------------------------------
 
 ```{r, include=F}
 

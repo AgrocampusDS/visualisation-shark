@@ -54,7 +54,7 @@ Présentation {data-icon="fas fa-mug-saucer"}
 
 Columns {data-width=400}
 -----------------------------------------------------------------------
-```{r picture, echo = F, fig.cap = "Title", out.width = '100%'}
+```{r picture, echo = F, out.width = '100%'}
 knitr::include_graphics("pngegg-2.png")
 ```
 
@@ -730,11 +730,10 @@ pie <- ggplot(data = req_pie1, aes(x="", y=Pourcentage, fill= Type)) +
                                "Unprovoked" = "#6495ED")[]) +
   geom_label_repel(data = df1,
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
-                   size = 2, nudge_x = 1, show.legend = FALSE) +
+                   size = 5, nudge_x = 1, show.legend = FALSE) +
   guides(fill = guide_legend(title = "Type")) +
   labs(title = "Répartition des Types d'attaques") +
-   theme(plot.title = element_text(size=9),
-          legend.text = element_text(size = 5))
+   theme(plot.title = element_text(size=15))
   # geom_text(aes(label = Type),
   #           position = position_stack(vjust = 0.5), color="white")
 pie
@@ -765,11 +764,11 @@ pie3 <- ggplot(data = req_pie3, aes(x="", y=Pourcentage, fill= Fatal..Y.N.)) +
                                "Non Mortel" = "#D4D3DC")) +
   geom_label_repel(data = df3,
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
-                   size = 2, nudge_x = 1, show.legend = FALSE) +
+                   size = 5, nudge_x = 1, show.legend = FALSE) +
   guides(fill = guide_legend(title = "Type")) +
   labs(title = "Intensité de dégâts des attaques 'unprovoked'") +
-   theme(plot.title = element_text(size=9),
-          legend.text = element_text(size = 5))
+   theme(plot.title = element_text(size=15)) #,
+          #legend.text = element_text(size = 5)
  
 ```
 
@@ -807,17 +806,43 @@ pie2 <- ggplot(data = req_pie2, aes(x="", y=Pourcentage, fill= Activity)) +
                                "sport/ activity" = "#F5CB5C")) +
   geom_label_repel(data = df2,
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
-                   size = 2, nudge_x = 1, show.legend = FALSE) +
+                   size = 5, nudge_x = 1, show.legend = FALSE) +
   guides(fill = guide_legend(title = "Activity")) +
   labs(title = "Activités des victimes lors de l'attaque") +
-  theme(plot.title = element_text(size=9),
-          legend.text = element_text(size = 5))
+  theme(plot.title = element_text(size=15))
   
 
 
 ```
 
+
+
+Row
+-------------------------------------
+
+### Description des attaques les plus récurrentes
+
 ```{r}
-plot_grid(pie, pie3,"",pie2, ncol = 2, nrow = 2)
+plot_grid(pie)
 ```
+
+Row {.tabset .tabset-fade}
+-------------------------------------
+
+### "Unprovoked": Activities 
+
+```{r}
+plot_grid(pie2)
+```
+
+### "Unprovoked": Dégats
+
+
+```{r}
+plot_grid(pie3)
+```
+
+
+
+
 

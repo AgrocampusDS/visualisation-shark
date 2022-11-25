@@ -1,9 +1,11 @@
 ---
-title: "Attaques de requins"
+title: "Attaques des requins"
 author: "Laurence et Shaimma"
 output: 
   flexdashboard::flex_dashboard:
-    favicon: pngegg-2.png
+    navbar:
+      - { title: "Source", align:right, href: "https://www.kaggle.com/code/jamesssd7245/most-dangeurous-sharks-countries-worldmap-analysis"}
+    source_code: embed
     theme: journal
     orientation: columns
     vertical_layout: fill
@@ -47,7 +49,212 @@ req <- requin %>%
 ```
 
 
-# Une Vision Globale 
+Présentation {data-icon="fas fa-mug-saucer"}
+=====================================
+
+Columns {data-width=400}
+-----------------------------------------------------------------------
+```{r picture, echo = F, fig.cap = "Title", out.width = '100%'}
+knitr::include_graphics("pngegg-2.png")
+```
+
+Columns {data-width=700}
+-----------------------------------------------------------------------
+
+```{r,include=FALSE}
+
+req$Country <- tolower(req$Country)
+
+req_pie <- req 
+req_pie[which(req_pie$Fatal..Y.N. !="Y"),]$Fatal..Y.N.  <- "Autres"
+req_pie[which(req_pie$Type == "Questionable"),]$Type <- "Invalid"
+
+# netoyage du jeu de donnée
+
+# diving 
+for (i in (1:nrow(req_pie))) {
+  if (grepl("diving", req_pie$Activity[i]) | (grepl("Diving", req_pie$Activity[i])) |
+      (grepl("Dived", req_pie$Activity[i]))) {
+    req_pie$Activity[i] <- "Diving"
+  } 
+}
+
+# fishing
+for (i in (1:nrow(req_pie))) {
+  if (grepl("fishing", req_pie$Activity[i]) | (grepl("Fishing", req_pie$Activity[i])) |
+      (grepl("lobsters", req_pie$Activity[i])) |
+      grepl("fish", req_pie$Activity[i]) |
+      grepl("bichiques", req_pie$Activity[i]) |
+      grepl("Casting", req_pie$Activity[i]) |
+      grepl("sardines", req_pie$Activity[i]) |
+      grepl("Crabbing", req_pie$Activity[i]) |
+      grepl("Clamming", req_pie$Activity[i]) |
+      grepl("turtle", req_pie$Activity[i]) |
+      grepl("prawns", req_pie$Activity[i])|
+      grepl("net", req_pie$Activity[i])
+  ) {
+    req_pie$Activity[i] <- "fishing"
+  } 
+}
+
+# air or sea disaster
+for (i in (1:nrow(req_pie))) {
+  if (grepl("disaster", req_pie$Activity[i]) | grepl("Disaster", req_pie$Activity[i])| 
+      (grepl("air", req_pie$Activity[i])) | (grepl("plane", req_pie$Activity[i]))
+      | (grepl("757", req_pie$Activity[i]))|
+      grepl("hurricane", req_pie$Activity[i])
+  ) {
+    req_pie$Activity[i] <- "Air/Sea disaster"
+  } 
+}
+
+# boat/ship accident de bateau 
+for (i in (1:nrow(req_pie))) {
+  if (grepl("Boat", req_pie$Activity[i]) | (grepl("boat", req_pie$Activity[i]))
+      | (grepl("ship", req_pie$Activity[i])) | (grepl("Fell", req_pie$Activity[i]))
+      | (grepl("Vessel", req_pie$Activity[i])) |
+      grepl("sank", req_pie$Activity[i])|
+      grepl("promotional film ", req_pie$Activity[i]) |
+      grepl("Ferry", req_pie$Activity[i])|
+      grepl("ferry", req_pie$Activity[i])|
+      grepl("capsiz", req_pie$Activity[i]) |
+      grepl("MV Dona Marilyn", req_pie$Activity[i]) |
+      grepl("schooner Elizabeth", req_pie$Activity[i]) |
+      grepl("Towing", req_pie$Activity[i]) |
+      grepl("Tzenny Chandris", req_pie$Activity[i]) |
+      grepl("Wreck", req_pie$Activity[i]) |
+      grepl("wreck", req_pie$Activity[i]) |
+      grepl("dinghy", req_pie$Activity[i]) |
+      grepl("yacht", req_pie$Activity[i]) |
+      grepl("Chumming", req_pie$Activity[i]) |
+      grepl("raft", req_pie$Activity[i]) |
+      grepl("Tagging", req_pie$Activity[i]) |
+      grepl("overboard", req_pie$Activity[i]) |
+      grepl("free the shark", req_pie$Activity[i]) |
+      grepl("rescue a shark", req_pie$Activity[i]) 
+  ) {
+    req_pie$Activity[i] <- "boat/ship accident"
+  } 
+}
+
+# sport 
+for (i in (1:nrow(req_pie))) {
+  if (grepl("surf", req_pie$Activity[i]) | grepl("Surf", req_pie$Activity[i]) |(grepl("boarding", req_pie$Activity[i]))|
+      grepl("Boarding", req_pie$Activity[i]) |
+      (grepl("batching", req_pie$Activity[i]))| (grepl("Bathing", req_pie$Activity[i])) |
+      (grepl("bathing", req_pie$Activity[i])) |
+      (grepl("Swim", req_pie$Activity[i]))| (grepl("swim", req_pie$Activity[i])) |
+      (grepl("fell", req_pie$Activity[i])) | (grepl("Paddling", req_pie$Activity[i]))| 
+      (grepl("Paddling", req_pie$Activity[i])) | (grepl("water", req_pie$Activity[i]))
+      | (grepl("Snorkeling", req_pie$Activity[i]))
+      | (grepl("Sitting", req_pie$Activity[i])) | 
+      grepl("Happy Jack", req_pie$Activity[i]) |
+      grepl("Bending", req_pie$Activity[i]) |
+      grepl("Canoe", req_pie$Activity[i]) |
+      grepl("paddling", req_pie$Activity[i]) |
+      grepl("Kaya", req_pie$Activity[i]) |
+      grepl("Lifesaving", req_pie$Activity[i]) |
+      grepl("Snorkeling", req_pie$Activity[i]) |
+      grepl("Stamding", req_pie$Activity[i])|
+      grepl("Wading", req_pie$Activity[i]) |
+      grepl("Wash", req_pie$Activity[i]) |
+      grepl("Workong", req_pie$Activity[i])| 
+      grepl("McIver", req_pie$Activity[i]) |
+      grepl("Standing", req_pie$Activity[i]) |
+      grepl("Crossing the bay", req_pie$Activity[i])|
+      grepl("Walking", req_pie$Activity[i]) |
+      grepl("kill a shark", req_pie$Activity[i]) |
+      grepl("Removing shark", req_pie$Activity[i]) |
+      grepl("Riding", req_pie$Activity[i]) |
+      grepl("Board sailing", req_pie$Activity[i])|
+      grepl("Exercising", req_pie$Activity[i]) |
+      grepl("Feeding sharks", req_pie$Activity[i]) |
+      grepl("Filming", req_pie$Activity[i]) |
+      grepl("ski", req_pie$Activity[i]) |
+      grepl("Jumping", req_pie$Activity[i]) |
+      grepl("Paddle", req_pie$Activity[i]) |
+      grepl("Play", req_pie$Activity[i]) |
+      grepl("Resting", req_pie$Activity[i])  |
+      grepl("floatation device", req_pie$Activity[i])|
+      grepl("Sculling", req_pie$Activity[i]) |
+      grepl("Splashing", req_pie$Activity[i]) |
+      grepl("Dr. Marais", req_pie$Activity[i]) |
+      grepl("Wrangling", req_pie$Activity[i]) |
+      grepl("Photographing", req_pie$Activity[i]) |
+      grepl("SUP", req_pie$Activity[i]) |
+      grepl("Kakay", req_pie$Activity[i]) 
+      
+  ) {
+    req_pie$Activity[i] <- "sport/ activity" }
+}
+
+
+
+# adrift
+for (i in (1:nrow(req_pie))) {
+  if (grepl("Adrift", req_pie$Activity[i]) | grepl("adrift", req_pie$Activity[i]) |
+      grepl("Floating", req_pie$Activity[i])|
+      grepl("3 men & 2 boys", req_pie$Activity[i]) |
+      grepl("float", req_pie$Activity[i])
+      ) {
+    req_pie$Activity[i] <- "Adrift"
+  } 
+}
+
+# murder /  war 
+for (i in (1:nrow(req_pie))) {
+  if (grepl("Murder", req_pie$Activity[i]) ||
+      grepl("submarine", req_pie$Activity[i]) |
+      grepl("American", req_pie$Activity[i]) |
+      grepl("torpedoed", req_pie$Activity[i]) |
+      grepl("Torpedoed", req_pie$Activity[i]) |
+      grepl("soldiers", req_pie$Activity[i]) |
+      grepl("Escaping", req_pie$Activity[i]) |
+      grepl("Japanese", req_pie$Activity[i]) |
+      grepl("Japan", req_pie$Activity[i]) |
+      grepl("Sinking", req_pie$Activity[i]) |
+      grepl("SS", req_pie$Activity[i]) |
+      grepl("foundered", req_pie$Activity[i])  |
+      grepl("US", req_pie$Activity[i])
+  ) {
+    req_pie$Activity[i] <- "murder /  war "
+  } 
+}
+
+```
+
+
+```{r}
+req_pres <- req_pie %>%
+  mutate("Year" = as.factor(Year), "Country" = as.factor(Country),
+         "Type" = as.factor(Type), "Activity" = as.factor(Activity),
+         "Consequence"= as.factor(Fatal..Y.N.))
+```
+
+<h4 style="color : Dark Blue;">
+
+Il existe une cinquaintaine d'espèces de requins dans la Méditerranée, et une centaine d'espèce dans l'Atlantique. <br>
+La plupart de ces espèces sont innofensives et trop petits pour constituer une réelle menace pour l'homme. <br> <br>
+Cependant, certaines espèces, dangereuses, peuvent être à l'origine de dégàts importants suite à leur interraction avec l'homme. <br>
+
+Nous tentons, dans cette étude, de visualiser les pays les plus touchés par les requins, et d'identifier les natures de ces attaques.
+
+Jeu de donnée à notre disposition: 
+- le nombre d’attaque du requin par pays et par année <br>
+- la nature de l'attaque (Type) <br>
+- l’activité du victime lors de l’attaque du requin <br>
+- la conséquence de l’attaque ('mortel' ou 'non mortel')
+
+</h4>
+
+```{r}
+summary(req_pres)
+```
+
+
+
+Vision Globale {data-icon="fas fa-map"}
+=====================================
 
 Columns {data-width=600}
 -----------------------------------------------------------------------
@@ -330,7 +537,8 @@ g
 ggplotly(nbatq)
 ```
 
-# La nature des attaques 
+La nature des attaques {data-icon="fas fa-fish"}
+===================================== 
 
 ```{r,include=FALSE}
 

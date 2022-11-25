@@ -800,7 +800,7 @@ pie2 <- ggplot(data = req_pie2, aes(x="", y=Pourcentage, fill= Activity)) +
   scale_fill_manual(values = c("Adrift" = "#B6D8F2",
                                "Air/Sea disaster" = "#5784BA",
                                "boat/ship accident" = "#7C4C53",
-                               "Diving" = "#00A0B0",
+                               "Diving" = "#D68910",
                                "fishing" = "#2a9d8f",
                                "murder /  war " = "#BD3100",
                                "sport/ activity" = "#F5CB5C")) +

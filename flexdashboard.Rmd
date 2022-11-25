@@ -446,7 +446,7 @@ map2 <- map +
   ggtitle("Nombre totale d'attaques par les requins entre 1930 et 2018") +
   #guides(fill = guide_legend(reverse = T))+
   theme(text = element_text(family = 'Gill Sans')   # mettre le texte en blanc et type de texte
-        ,plot.title = element_text(size = 11)
+        ,plot.title = element_text(size = 11, vjust= 2, hjust= 0.4)
         ,panel.background = element_rect(fill = '#b3e2f5') # ajouter couleur du fond de carte  
         #,plot.background = element_rect(fill = '#333333') # ajouter couleur de fond 
         ,legend.position="bottom")
@@ -458,17 +458,17 @@ map2 <- map +
 # add oceans /sea/ gulf point 
 # ===========================
 
-map3 <- map2 +
-  new_scale_color() +
-  geom_point(data = geom_test, 
-             aes(x=long, y=lat, col = attacks, fill=attacks),
-             colour = "black", pch=21, size=2, show.legend = T) +
-  # geom_text_repel(data = geom_test, aes(x=long, y=lat, label=admin),
-  #                  point.padding = 0.5,
-  #                  segment.color = 'white',
-  #                  colour =  "#394b85",
-  #                  size=3)+
-  scale_color_distiller(palette = "YlOrRd", trans= "log", direction = 1 )  
+map3 <- map2#  +
+  # new_scale_color() +
+  # geom_point(data = geom_test, 
+  #            aes(x=long, y=lat, col = attacks, fill=attacks),
+  #            colour = "black", pch=21, size=2, show.legend = T) +
+  # # geom_text_repel(data = geom_test, aes(x=long, y=lat, label=admin),
+  # #                  point.padding = 0.5,
+  # #                  segment.color = 'white',
+  # #                  colour =  "#394b85",
+  # #                  size=3)+
+  # scale_color_distiller(palette = "YlOrRd", trans= "log", direction = 1 )  
 ```
 
 ```{r}
@@ -497,7 +497,7 @@ val[val==""]<-NA
 val <- val %>%
   mutate_at(c('Type'), ~replace_na(.,"Boat"))
 #graph
-nbatq <- ggplot(val, aes(Year,n), alpha= Country ) + geom_line(aes( color=Type))+ggtitle("Evolution des attaques des requins pour les 3 premiers Pays") +ylab("Nb Attaques") + xlab("Année")+theme(plot.title = element_text(face="bold",color = "#607c8e", size = 15, hjust=0.5,vjust=1, family = "Serif"),
+nbatq <- ggplot(val, aes(Year,n), alpha= Country ) + geom_line(aes( color=Type))+ggtitle("Evolution des attaques des requins pour les 3 premiers Pays") +ylab("Nb Attaques") + xlab("Année")+theme(plot.title = element_text(face="bold",color = "#607c8e", size = , hjust=0.5,vjust=1, family = "Serif"),
                        legend.position = c(0.2, 0.8),
                        axis.title.x = element_text( face = "bold",size=10),
                        axis.title.y = element_text(face = "bold",size=10),

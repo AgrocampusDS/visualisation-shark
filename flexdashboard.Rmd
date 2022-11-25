@@ -239,7 +239,7 @@ Cependant, certaines espèces, dangereuses, peuvent être à l'origine de dégà
 
 Nous tentons, dans cette étude, de visualiser les pays les plus touchés par les requins, et d'identifier les natures de ces attaques.
 
-Jeu de donnée à notre disposition: 
+Jeu de donnée à notre disposition:  <br>
 - le nombre d’attaque du requin par pays et par année <br>
 - la nature de l'attaque (Type) <br>
 - l’activité du victime lors de l’attaque du requin <br>

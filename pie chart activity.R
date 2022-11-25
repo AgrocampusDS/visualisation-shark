@@ -2,6 +2,7 @@
 library(ggplot2)
 library(ggrepel)
 library(tidyverse)
+library(cowplot)
 
 
 ###### mise en forme du jeu de donnée pour avoir les groupes d'activités 
@@ -13,17 +14,20 @@ req <- requin %>%
   select("Year", "Type", "Country", "Area","Activity", "Fatal..Y.N.") %>%
   filter(Year >= 1930)
 
-req_pie <- req %>% 
-  select("Type",  "Fatal..Y.N.", "Activity", "Country")
 
-## 1e "group by" des activités 
+##############################
+# netoyage du jeu de donnée
+#############################
 
-# req_pie <- req %>%
-#   filter(Fatal..Y.N. == "Y", Type== "Unprovoked") %>%
-#   group_by(Activity) %>%
-#   summarise(Effectif = n(), Pourcentage = Effectif/353) 
 
-###### regroupement des "activitésé selon leur nature 
+req$Country <- tolower(req$Country)
+
+req_pie <- req %>%
+  filter(Country %in% c("usa", "australia", "south africa"))
+req_pie[which(req_pie$Fatal..Y.N. !="Y"),]$Fatal..Y.N.  <- "Autres"
+req_pie[which(req_pie$Type == "Questionable"),]$Type <- "Invalid"
+
+# netoyage du jeu de donnée
 
 # diving 
 for (i in (1:nrow(req_pie))) {
@@ -150,7 +154,7 @@ for (i in (1:nrow(req_pie))) {
       grepl("Floating", req_pie$Activity[i])|
       grepl("3 men & 2 boys", req_pie$Activity[i]) |
       grepl("float", req_pie$Activity[i])
-      ) {
+  ) {
     req_pie$Activity[i] <- "Adrift"
   } 
 }
@@ -175,87 +179,20 @@ for (i in (1:nrow(req_pie))) {
   } 
 }
 
-# req_pie_final <- req_pie %>%
-#   group_by(Activity) %>%
-#   summarise(Effectif = n(), Pourcentage = Effectif/353) 
-# 
-# sum(req_pie_final$Effectif) # 236 unprovoked 
-# 
-# req_pie_final <- req_pie_final[-1,]
 
+##############################
+# 1e graphe: répartition des types d'attaques
+#############################
 
-########################################################################
-#### faire le pie chart avec uniquement les unprovoked 
-########################################################################
-
-######## multi-level pie chart
-library(ggplot2)
-library(webr)
-library(dplyr)
-
-# req_pie <- req %>%
-#   filter(Fatal..Y.N. == "Y", Type== "Unprovoked") %>%
-#   group_by(Activity) %>%
-#   summarise(Effectif = n(), Pourcentage = Effectif/353) 
-
-# req_pie <- req %>% 
-#   select("Type",  "Fatal..Y.N.", "Activity")
-
-
-req_pie2 <- req_pie%>%  
-  group_by(Type, Fatal..Y.N., Activity) %>%
-  summarise(Effectif = n(), Pourcentage = Effectif/3480) 
-
-req_pie2[which(req_pie2$Type =="Boating"),]$Type <- "Boat"
-req_pie2[which(req_pie2$Type =="Boatomg"),]$Type <- "Boat"
-req_pie2 <- req_pie2[-c(1,2,3),]
-req_pie2[which(req_pie2$Fatal..Y.N. !="Y"),]$Fatal..Y.N.  <- "Autres"
-req_pie2[which(req_pie2$Type == "Questionable"),]$Type <- "Invalid"
-
-req_pie[which(req_pie$Type =="Boating"),]$Type <- "Boat"
-req_pie[which(req_pie$Type =="Boatomg"),]$Type <- "Boat"
-req_pie <- req_pie[-c(1,2,3),]
-req_pie[which(req_pie$Fatal..Y.N. !="Y"),]$Fatal..Y.N.  <- "Autres"
-req_pie[which(req_pie$Type == "Questionable"),]$Type <- "Invalid"
-
-pie_donut <- PieDonut(req_pie, aes(Type, Fatal..Y.N., Activity,Pourcentage), 
-         title="Fatalité des attaques par type") 
-pie_donut
-table(req)
-
-req_pie2
-ggplot(data = req_pie2, aes(x= Type, y=Pourcentage)) +
-  geom_bar(stat = "identity")
-
-
-library(ggplot2)
-
-
-
-
-
-###########################################################################################
-# pie chart 
-
-#####
-# le pourcentage de type en amérique,australie et south africa 
-
-req$Country <- tolower(req$Country)
-
-req_pie <- req %>%
-  filter(Country %in% c("usa", "australia", "south africa"))
-
-#req_pie <- req_pie2[-c(1,2,3),]
-req_pie[which(req_pie$Fatal..Y.N. !="Y"),]$Fatal..Y.N.  <- "Autres"
-req_pie[which(req_pie$Type == "Questionable"),]$Type <- "Invalid"
-
-## des pourcentages de type 
+# on se concentre sur les 3 pays les plus touchés
+#pie1
 req_pie1 <- req_pie %>%
   group_by(Type) %>%
   summarise(Effectif=n(), Pourcentage = Effectif/3480, 
             ypos = (cumsum(Pourcentage) - 0.5*Pourcentage)) 
 req_pie1 <- req_pie1[-1,]
 
+req_pie1$Type
 df1 <- req_pie1 %>% 
   mutate(csum = rev(cumsum(rev(Pourcentage))), 
          pos = Pourcentage/2 + lead(csum, 1),
@@ -266,24 +203,26 @@ pie <- ggplot(data = req_pie1, aes(x="", y=Pourcentage, fill= Type)) +
   geom_bar(stat="identity", width=1, color= "white") +
   coord_polar("y", start=0) +
   theme_void() +
-  scale_fill_manual(values = c("Boat" = "#B6D8F2",
-                               "Invalid" = "#ECF8F6",
-                               "Provoked" = "#ffbdfd",
-                               "Sea Disaster" = "#5784BA",
-                               "Unprovoked" = "#F7F6CF")) +
+  scale_fill_manual(values = c("Boat" = "#DAF7A6",
+                               "Invalid" = "#E5E4E2",
+                               "Provoked" = "#FFA500",
+                               "Sea Disaster" = "#E97451",     
+                               "Unprovoked" = "#6495ED")[]) +
   geom_label_repel(data = df1,
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
-                   size = 4.5, nudge_x = 1, show.legend = FALSE) +
+                   size = 2, nudge_x = 1, show.legend = FALSE) +
   guides(fill = guide_legend(title = "Type")) +
-  
-  ggtitle("Répartion des Types d'attaques") 
-  # geom_text(aes(label = Type),
-  #           position = position_stack(vjust = 0.5), color="white")
+  labs(title = "Répartition des Types d'attaques") +
+  theme(plot.title = element_text(size=9),
+        legend.text = element_text(size = 5))
+# geom_text(aes(label = Type),
+#           position = position_stack(vjust = 0.5), color="white")
 pie
 
-############################
-# pie2, les activités les plus récurrents dans unprovoked 
-############################
+
+##############################
+# 2e graphe: conséquences des attaques
+#############################
 
 req_pie2 <- req_pie %>%
   filter(Type =="Unprovoked", Activity!="") %>%
@@ -310,21 +249,28 @@ pie2 <- ggplot(data = req_pie2, aes(x="", y=Pourcentage, fill= Activity)) +
                                "sport/ activity" = "#F5CB5C")) +
   geom_label_repel(data = df2,
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
-                   size = 4.5, nudge_x = 1, show.legend = FALSE) +
-  guides(fill = guide_legend(title = "Type")) +
-  
-  ggtitle("Activités des victimes lors de l'attaque") +
-  pi
-# geom_text(aes(label = Type),
-#           position = position_stack(vjust = 0.5), color="white")
+                   size = 2, nudge_x = 1, show.legend = FALSE) +
+  guides(fill = guide_legend(title = "Activity")) +
+  labs(title = "Activités des victimes lors de l'attaque") +
+  theme(plot.title = element_text(size=9),
+        legend.text = element_text(size = 5))
+
+
+
 pie2
 
-# pie3 ces activités unprovoked sont-ils fatals? 
+
+##############################
+# 3z graphe: activité des victimes en cours
+#############################
+
 
 req_pie3 <- req_pie %>%
   filter(Type =="Unprovoked", Activity!="") %>%
   group_by(Fatal..Y.N.) %>%
-  summarise(Effectif=n(), Pourcentage = Effectif/2448)
+  summarise(Effectif=n(), Pourcentage = Effectif/2444, 
+            ypos = (cumsum(Pourcentage) - 0.5*Pourcentage)) 
+
 
 req_pie3$Fatal..Y.N.[which(req_pie3$Fatal..Y.N. =="Y")] <- "Mortel"
 req_pie3$Fatal..Y.N.[which(req_pie3$Fatal..Y.N. =="Autres")] <- "Non Mortel"
@@ -333,33 +279,28 @@ df3 <- req_pie3 %>%
   mutate(csum = rev(cumsum(rev(Pourcentage))), 
          pos = Pourcentage/2 + lead(csum, 1),
          pos = if_else(is.na(pos), Pourcentage/2, pos))
-
+df3$pos[2] <- 0.95
 pie3 <- ggplot(data = req_pie3, aes(x="", y=Pourcentage, fill= Fatal..Y.N.)) +
-  geom_bar(stat="identity", width=1, color= "white", color="red") +
+  geom_bar(stat="identity", width=1, color= "white") +
   coord_polar("y", start=0) +
   theme_void() +
   scale_fill_manual(values = c("Mortel" = "#FC4E00",
                                "Non Mortel" = "#D4D3DC")) +
   geom_label_repel(data = df3,
                    aes(y = pos, label = paste0(round(Pourcentage*100,1), "%")),
-                   size = 4.5, nudge_x = 1, show.legend = FALSE) +
+                   size = 2, nudge_x = 1, show.legend = FALSE) +
   guides(fill = guide_legend(title = "Type")) +
-  
-  ggtitle("Intensité de dégâts des attaques 'unprovoked") 
-# geom_text(aes(label = Type),
-#           position = position_stack(vjust = 0.5), color="white")
+  labs(title = "Intensité de dégâts des attaques 'unprovoked'") +
+  theme(plot.title = element_text(size=9),
+        legend.text = element_text(size = 5))
 pie3
 
-par(mfrow=c(1,2))
-pie
-pie2
-pie3
+
 
 ##############################
-# pie chart avec les activités
+# plot des 3 en meme temps
 #############################
 
-library(cowplot)
 plot_grid(pie, pie3,"",pie2, ncol = 2, nrow = 2)
 
 # 

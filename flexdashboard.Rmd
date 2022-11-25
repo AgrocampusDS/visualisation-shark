@@ -519,7 +519,7 @@ typ2 <- typ2 %>%
 g <- ggplot(typ2, aes(x=Type, y=n, fill=Country)) +geom_boxplot(outlier.shape=NA)+
   scale_fill_manual(values=c("darkgoldenrod1","darkred", "#002868")) + ylab("Nb Attaques")+
   theme(axis.text.x = element_text(angle = 90, hjust = 1), panel.background = element_rect(fill = "white"),
-                       panel.grid.major = element_line(colour = "#bababa"))+ scale_y_continuous(breaks = seq(0, 88, by = 10))  +ggtitle(" Distribution Types d'attaques par Pays")
+                       panel.grid.major = element_line(colour = "#bababa"))+ scale_y_continuous(breaks = seq(0, 88, by = 10))  +ggtitle("Moyenne annuelle des attaques par type")
 
 ```
 

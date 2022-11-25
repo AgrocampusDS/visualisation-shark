@@ -817,31 +817,7 @@ pie2 <- ggplot(data = req_pie2, aes(x="", y=Pourcentage, fill= Activity)) +
 
 ```
 
-Row 
--------------------------------------
-    
-### Description des attaques les plus récurrentes
-    
 ```{r}
-plot_grid(pie)
+plot_grid(pie, pie3,"",pie2, ncol = 2, nrow = 2)
 ```
-   
-Row {.tabset .tabset-fade}
--------------------------------------
-   
-### Activities
-
-```{r}
-plot_grid(pie2)
-```   
- 
-### Intensité
-    
-
-```{r}
-plot_grid(pie3)
-```
-
-
-
 

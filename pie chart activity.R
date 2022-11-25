@@ -362,3 +362,34 @@ pie3
 library(cowplot)
 plot_grid(pie, pie3,"",pie2, ncol = 2, nrow = 2)
 
+# 
+# Row 
+# -------------------------------------
+#   
+#   ### Description des attaques les plus récurrentes
+#   
+#   ```{r, include=FALSE}
+# plot_grid(pie)
+# ```
+# 
+# Row {.tabset .tabset-fade}
+# -------------------------------------
+#   
+#   ### Activities
+#   
+#   ```{r, include=FALSE}
+# plot_grid(pie2)
+# ```   
+# 
+# ### Intensité
+# 
+# 
+# ```{r, include=FALSE}
+# plot_grid(pie3)
+# ```
+# 
+# 
+
+
+
+
